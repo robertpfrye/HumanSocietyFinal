@@ -371,7 +371,7 @@ namespace HumaneSociety
 
             foreach (KeyValuePair<int,string> update in updates)
             {
-              animal=( db.Animals.Where(a => a[command[update.Key]] == update.Value)).ToList();
+              animal=( db.Animals.Where(a => a[command[update.Key]].ToString() == update.Value.ToString())).ToList();
                 foreach (Animal item in animal)
                 {
                     output.Add(item);
@@ -476,7 +476,7 @@ namespace HumaneSociety
             }
             catch (InvalidOperationException e)
             {
-                Shot newshot = new Shot(); 
+                Shot newshot = new Shot();
                 newshot.Name = shotName;
                 db.Shots.InsertOnSubmit(newshot);
                 db.SubmitChanges();
