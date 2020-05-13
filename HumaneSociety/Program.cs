@@ -12,9 +12,7 @@ namespace HumaneSociety
         {
 
             PointOfEntry.Run();
-            //HumaneSocietyDataContext db = new HumaneSocietyDataContext();
-            //Animal duke = db.Animals.Where(a => a.AnimalId == 1).Single();
-            //Query.RemoveAnimal(duke);
+
         }
     }
 }
