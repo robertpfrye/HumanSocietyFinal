@@ -396,14 +396,15 @@ namespace HumaneSociety
             List<Animal> animal = new List<Animal>();
             List<Animal> output = new List<Animal>();
 
-            foreach (KeyValuePair<int,string> update in updates)
-            {
-              animal=( db.Animals.Where(a => a[command[update.Key]].ToString() == update.Value.ToString())).ToList();
-                foreach (Animal item in animal)
-                {
-                    output.Add(item);
-                }
-            }
+
+            //foreach (KeyValuePair<int,string> update in updates)
+            //{
+            //  animal=( db.Animals.Where(a => a[command[update.Key]].ToString() == update.Value.ToString())).ToList();
+            //    foreach (Animal item in animal)
+            //    {
+            //        output.Add(item);
+            //    }
+            //}
             return output.Distinct().ToList();
         }
 
