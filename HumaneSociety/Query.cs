@@ -388,19 +388,31 @@ namespace HumaneSociety
         }
         
         // TODO: Animal Multi-Trait Search
-        internal static IQueryable<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
+        internal static List<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
         {
-            throw new NotImplementedException();
+            List<string> command = new List<string>() { "Category", "Name", "Age", "Demeanor", "KidFriendly", "PetFriendly", "Weight", "ID" };
+            List<Animal> animal = new List<Animal>();
+            List<Animal> output = new List<Animal>();
+
+            foreach (KeyValuePair<int,string> update in updates)
+            {
+              animal=( db.Animals.Where(a => a[command[update.Key]] == update.Value)).ToList();
+                foreach (Animal item in animal)
+                {
+                    output.Add(item);
+                }
+            }
+            return output.Distinct().ToList();
         }
-         
+
         // TODO: Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            var category= db.Categories.Where(c => c.Name == categoryName).Single();
+            var category= db.Categories.Where(c => c.Name.Contains( categoryName)).Single();
             return category.CategoryId;
         }
         
-        internal static Room GetRoom(int animalId)//Check if animal null
+        internal static Room GetRoom(int animalId)
         {
             try
             {
@@ -423,20 +435,50 @@ namespace HumaneSociety
         // TODO: Adoption CRUD Operations
         internal static void Adopt(Animal animal, Client client)
         {
-            throw new NotImplementedException();
+            Adoption adoption = new Adoption();
+            adoption.AnimalId = animal.AnimalId;
+            adoption.ClientId = client.ClientId;
+            adoption.ApprovalStatus = "pending";
+
+            Console.WriteLine("Has the adoption fee been paid?");
+            if ((bool)UserInterface.GetBitData())
+            {
+                Console.WriteLine("How much was paid?");
+                adoption.AdoptionFee = UserInterface.GetIntegerData();
+                adoption.PaymentCollected = true;
+            }
+            db.Adoptions.InsertOnSubmit(adoption);
         }
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
         {
-            throw new NotImplementedException();
+            return db.Adoptions.Where(a => a.ApprovalStatus == "pending");
         }
 
         internal static void UpdateAdoption(bool isAdopted, Adoption adoption)
         {
-            throw new NotImplementedException();
+            if (isAdopted)
+            {
+                adoption.ApprovalStatus = "Approved";
+                return;
+            }
+            Console.WriteLine("update payment? y/n");
+            if ((bool)UserInterface.GetBitData())
+            {
+                Console.WriteLine("How much was paid?");
+                adoption.AdoptionFee= UserInterface.GetIntegerData();
+                adoption.PaymentCollected = true;
+            }
+            Console.WriteLine("Issue refund?");
+            if ((bool)UserInterface.GetBitData())
+            {
+                adoption.PaymentCollected = false;
+                adoption.AdoptionFee = 0;
+            }
+
         }
 
-        internal static void RemoveAdoption(int animalId, int clientId)
+        internal static void RemoveAdoption(int animalId, int clientId)//_stilltodo_______________________________________________/^\
         {
             throw new NotImplementedException();
         }
@@ -456,17 +498,14 @@ namespace HumaneSociety
             }
             catch (InvalidOperationException e)
             {
-                Shot newshot = new Shot();
+                Shot newshot = new Shot(); 
                 newshot.Name = shotName;
                 db.Shots.InsertOnSubmit(newshot);
                 db.SubmitChanges();
                 shot = db.Shots.Where(s => s.Name == shotName).Single();
             }
-
-            animal.AnimalShots = shot.AnimalShots;
-            
+            animal.AnimalShots = shot.AnimalShots;            
             db.SubmitChanges();
-
         }
     }
 }
