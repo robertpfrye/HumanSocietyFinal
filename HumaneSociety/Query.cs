@@ -333,11 +333,37 @@ namespace HumaneSociety
             {
                 currentAnimal.Name = name;
             }
-            //rob, make this one below like the one above^
+
+            string age;
+            if (updates.TryGetValue(3, out age))
+            {
+                currentAnimal.Age = int.Parse(age);
+            }
+
+            string demeanor;
+            if (updates.TryGetValue(4, out demeanor))
+            {
+                currentAnimal.Demeanor = demeanor;
+            }
+
+            string kidFriendly;
+            if (updates.TryGetValue(5, out kidFriendly))
+            {
+                currentAnimal.KidFriendly = bool.Parse(kidFriendly);
+            }
+
+            string petFriendly;
+            if(updates.TryGetValue(6, out petFriendly))
+            {
+                currentAnimal.PetFriendly = bool.Parse(petFriendly);
+            }
+
             string weight;
-            updates.TryGetValue(7, out weight);
-            currentAnimal.Weight = int.Parse(weight);
-            //then do the same for the rest of the dictionary values above.
+            if ( updates.TryGetValue(7, out weight))
+            {
+                currentAnimal.Weight = int.Parse(weight);
+            }
+
 
             
             //currentAnimal.Age = animal.Age;
@@ -357,35 +383,24 @@ namespace HumaneSociety
 
         internal static void RemoveAnimal(Animal animal)
         {
-            
+            db.Animals.DeleteOnSubmit(animal);
+            db.SubmitChanges();
         }
         
         // TODO: Animal Multi-Trait Search
-        internal static List<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
+        internal static IQueryable<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
         {
-            List<string> command = new List<string>() { "Category", "Name", "Age", "Demeanor", "KidFriendly", "PetFriendly", "Weight", "ID" };
-            List<Animal> animal = new List<Animal>();
-            List<Animal> output = new List<Animal>();
-
-            foreach (KeyValuePair<int,string> update in updates)
-            {
-              animal=( db.Animals.Where(a => a[command[update.Key]] == update.Value)).ToList();
-                foreach (Animal item in animal)
-                {
-                    output.Add(item);
-                }
-            }
-            return output.Distinct().ToList();
+            throw new NotImplementedException();
         }
-
+         
         // TODO: Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            var category= db.Categories.Where(c => c.Name.Contains( categoryName)).Single();
+            var category= db.Categories.Where(c => c.Name == categoryName).Single();
             return category.CategoryId;
         }
         
-        internal static Room GetRoom(int animalId)
+        internal static Room GetRoom(int animalId)//Check if animal null
         {
             try
             {
@@ -408,50 +423,20 @@ namespace HumaneSociety
         // TODO: Adoption CRUD Operations
         internal static void Adopt(Animal animal, Client client)
         {
-            Adoption adoption = new Adoption();
-            adoption.AnimalId = animal.AnimalId;
-            adoption.ClientId = client.ClientId;
-            adoption.ApprovalStatus = "pending";
-
-            Console.WriteLine("Has the adoption fee been paid?");
-            if ((bool)UserInterface.GetBitData())
-            {
-                Console.WriteLine("How much was paid?");
-                adoption.AdoptionFee = UserInterface.GetIntegerData();
-                adoption.PaymentCollected = true;
-            }
-            db.Adoptions.InsertOnSubmit(adoption);
+            throw new NotImplementedException();
         }
 
         internal static IQueryable<Adoption> GetPendingAdoptions()
         {
-            return db.Adoptions.Where(a => a.ApprovalStatus == "pending");
+            throw new NotImplementedException();
         }
 
         internal static void UpdateAdoption(bool isAdopted, Adoption adoption)
         {
-            if (isAdopted)
-            {
-                adoption.ApprovalStatus = "Approved";
-                return;
-            }
-            Console.WriteLine("update payment? y/n");
-            if ((bool)UserInterface.GetBitData())
-            {
-                Console.WriteLine("How much was paid?");
-                adoption.AdoptionFee= UserInterface.GetIntegerData();
-                adoption.PaymentCollected = true;
-            }
-            Console.WriteLine("Issue refund?");
-            if ((bool)UserInterface.GetBitData())
-            {
-                adoption.PaymentCollected = false;
-                adoption.AdoptionFee = 0;
-            }
-
+            throw new NotImplementedException();
         }
 
-        internal static void RemoveAdoption(int animalId, int clientId)//_stilltodo_______________________________________________/^\
+        internal static void RemoveAdoption(int animalId, int clientId)
         {
             throw new NotImplementedException();
         }
@@ -477,8 +462,11 @@ namespace HumaneSociety
                 db.SubmitChanges();
                 shot = db.Shots.Where(s => s.Name == shotName).Single();
             }
-            animal.AnimalShots = shot.AnimalShots;            
+
+            animal.AnimalShots = shot.AnimalShots;
+            
             db.SubmitChanges();
+
         }
     }
 }
