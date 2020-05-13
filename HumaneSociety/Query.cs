@@ -333,11 +333,37 @@ namespace HumaneSociety
             {
                 currentAnimal.Name = name;
             }
-            //rob, make this one below like the one above^
+
+            string age;
+            if (updates.TryGetValue(3, out age))
+            {
+                currentAnimal.Age = int.Parse(age);
+            }
+
+            string demeanor;
+            if (updates.TryGetValue(4, out demeanor))
+            {
+                currentAnimal.Demeanor = demeanor;
+            }
+
+            string kidFriendly;
+            if (updates.TryGetValue(5, out kidFriendly))
+            {
+                currentAnimal.KidFriendly = bool.Parse(kidFriendly);
+            }
+
+            string petFriendly;
+            if(updates.TryGetValue(6, out petFriendly))
+            {
+                currentAnimal.PetFriendly = bool.Parse(petFriendly);
+            }
+
             string weight;
-            updates.TryGetValue(7, out weight);
-            currentAnimal.Weight = int.Parse(weight);
-            //then do the same for the rest of the dictionary values above.
+            if ( updates.TryGetValue(7, out weight))
+            {
+                currentAnimal.Weight = int.Parse(weight);
+            }
+
 
             
             //currentAnimal.Age = animal.Age;
@@ -357,7 +383,8 @@ namespace HumaneSociety
 
         internal static void RemoveAnimal(Animal animal)
         {
-            throw new NotImplementedException();
+            db.Animals.DeleteOnSubmit(animal);
+            db.SubmitChanges();
         }
         
         // TODO: Animal Multi-Trait Search
