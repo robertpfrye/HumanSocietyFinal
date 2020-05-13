@@ -269,27 +269,10 @@ namespace HumaneSociety
                 Console.ReadLine();
             }
 
-            //Console.WriteLine(thisAnimal.AnimalId);
-            //Console.WriteLine(thisAnimal.Name);
-            //Console.WriteLine(thisAnimal.Weight);
-            //Console.WriteLine(thisAnimal.Age);
-            //Console.WriteLine(thisAnimal.Demeanor);
-            //Console.WriteLine(thisAnimal.KidFriendly);
-            //Console.WriteLine(thisAnimal.PetFriendly);
-            //Console.WriteLine(thisAnimal.Gender);
-            //Console.WriteLine(thisAnimal.AdoptionStatus);
-            //Console.WriteLine(thisAnimal.CategoryId);
-            //Console.WriteLine(thisAnimal.Category);
-            //Console.WriteLine(thisAnimal.DietPlanId);
-            //Console.WriteLine(thisAnimal.DietPlan);
-            //Console.WriteLine(thisAnimal.EmployeeId);
-            //Console.WriteLine(thisAnimal.Employee);
 
-            //Console.WriteLine("No updates have been made. Press any key to continue.");
-            //Console.ReadKey();
 
             return thisAnimal;
-            //throw new NotImplementedException();
+
         }
 
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)//Rob
@@ -365,20 +348,10 @@ namespace HumaneSociety
             }
 
 
-            
-            //currentAnimal.Age = animal.Age;
-            //currentAnimal.Demeanor = animal.Demeanor;
-            //currentAnimal.KidFriendly = animal.KidFriendly;
-            //currentAnimal.PetFriendly = animal.PetFriendly;
-            //currentAnimal.Gender = animal.Gender;
-            //currentAnimal.AdoptionStatus = animal.AdoptionStatus;
-            //currentAnimal.DietPlanId = animal.DietPlanId;
-            //currentAnimal.DietPlan = animal.DietPlan;
-            //currentAnimal.EmployeeId = animal.EmployeeId;
-            //currentAnimal.Employee = animal.Employee;
+ 
             db.SubmitChanges();
 
-            //throw new NotImplementedException();
+
         }
 
         internal static void RemoveAnimal(Animal animal)
@@ -482,7 +455,10 @@ namespace HumaneSociety
 
         internal static void RemoveAdoption(int animalId, int clientId)//_stilltodo_______________________________________________/^\
         {
-            throw new NotImplementedException();
+            Adoption adoption = db.Adoptions.Where(a => a.AnimalId == animalId && a.ClientId == clientId).Single();
+            db.Adoptions.DeleteOnSubmit(adoption);
+            db.SubmitChanges();
+            //throw new NotImplementedException();
         }
 
         // TODO: Shots Stuff
