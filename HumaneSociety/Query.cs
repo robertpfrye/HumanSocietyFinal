@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -253,14 +254,76 @@ namespace HumaneSociety
             throw new NotImplementedException();
         }
 
-        internal static Animal GetAnimalByID(int id)
+        internal static Animal GetAnimalByID(int id)//Rob
         {
-            throw new NotImplementedException();
+            Animal thisAnimal = null;
+            try
+            {
+                thisAnimal = db.Animals.Where(a => a.AnimalId == id).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No animals have an id number that matches the animal requested.");
+                Console.WriteLine("No updates have been made. Enter to continue.");
+                Console.ReadLine();
+                return thisAnimal;
+            }
+
+            Console.WriteLine(thisAnimal.AnimalId);
+            Console.WriteLine(thisAnimal.Name);
+            Console.WriteLine(thisAnimal.Weight);
+            Console.WriteLine(thisAnimal.Age);
+            Console.WriteLine(thisAnimal.Demeanor);
+            Console.WriteLine(thisAnimal.KidFriendly);
+            Console.WriteLine(thisAnimal.PetFriendly);
+            Console.WriteLine(thisAnimal.Gender);
+            Console.WriteLine(thisAnimal.AdoptionStatus);
+            Console.WriteLine(thisAnimal.CategoryId);
+            Console.WriteLine(thisAnimal.Category);
+            Console.WriteLine(thisAnimal.DietPlanId);
+            Console.WriteLine(thisAnimal.DietPlan);
+            Console.WriteLine(thisAnimal.EmployeeId);
+            Console.WriteLine(thisAnimal.Employee);
+
+            Console.WriteLine("No updates have been made. Press any key to continue.");
+            Console.ReadKey();
+
+            return thisAnimal;
+            //throw new NotImplementedException();
         }
 
-        internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)
-        {            
-            throw new NotImplementedException();
+        internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)//Rob
+        {
+            Animal currentAnimal = null;
+            //"Select Update:", "1. Category", "2. Name", "3. Age", "4. Demeanor", 
+            //"5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Finished"
+            try
+            {
+                currentAnimal = db.Animals.Where(a => a.AnimalId == animalId).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No animals have an id number that matches the animal requested.");
+                Console.WriteLine("No updates have been made.");
+                return;
+            }
+            /*currentAnimal.Name = animal.Name;
+            currentAnimal.Weight = animal.Weight;
+            currentAnimal.Age = animal.Age;
+            currentAnimal.Demeanor = animal.Demeanor;
+            currentAnimal.KidFriendly = animal.KidFriendly;
+            currentAnimal.PetFriendly = animal.PetFriendly;
+            currentAnimal.Gender = animal.Gender;
+            currentAnimal.AdoptionStatus = animal.AdoptionStatus;
+            currentAnimal.CategoryId = animal.CategoryId;
+            currentAnimal.Category = animal.Category;
+            currentAnimal.DietPlanId = animal.DietPlanId;
+            currentAnimal.DietPlan = animal.DietPlan;
+            currentAnimal.EmployeeId = animal.EmployeeId;
+            currentAnimal.Employee = animal.Employee;
+            db.SubmitChanges();*/
+
+            //throw new NotImplementedException();
         }
 
         internal static void RemoveAnimal(Animal animal)
@@ -280,7 +343,7 @@ namespace HumaneSociety
             throw new NotImplementedException();
         }
         
-        internal static Room GetRoom(int animalId)
+        internal static Room GetRoom(Animal animalId)//Check if animal null
         {
             throw new NotImplementedException();
         }
@@ -291,7 +354,7 @@ namespace HumaneSociety
         }
 
         // TODO: Adoption CRUD Operations
-        internal static void Adopt(Animal animal, Client client)
+        internal static void Adopt(Animal animal, Client client)//Check if animal null
         {
             throw new NotImplementedException();
         }
