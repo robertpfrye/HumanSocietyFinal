@@ -164,11 +164,89 @@ namespace HumaneSociety
         //// TODO Items: ////
         
         // TODO: Allow any of the CRUD operations to occur here
-        internal static void RunEmployeeQueries(Employee employee, string crudOperation)
+        internal static void RunEmployeeQueries(Employee employee, string crudOperation)//tony
         {
-            throw new NotImplementedException();
-        }
+            Employee workingEmployee;
+            switch (crudOperation)
+            {
+                case "update":
+                    UpdateEmployee(employee);
+                    break;
+                case "read":
+                    ReadEmployee(employee);
+                    break;
+                case "delete":
+                    try
+                    {
+                        workingEmployee = db.Employees.Where(c => c.EmployeeId == employee.EmployeeId).Single();
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        Console.WriteLine("No employees have an id number that matches the employee requested.");
+                        Console.WriteLine("No update have been made.");
+                        return;
+                    }
 
+                    //todo figure out how to delete employee
+                    break;
+                case "create":
+                    db.Employees.InsertOnSubmit(employee);
+                    db.SubmitChanges();
+
+                    break;                    
+            }
+
+
+        }
+        private static void UpdateEmployee(Employee employee)//tony
+        {
+            Employee workingEmployee = null; 
+
+            try
+            {
+                workingEmployee = db.Employees.Where(c => c.EmployeeNumber == employee.EmployeeNumber).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No employees have an id number that matches the employee requested.");
+                Console.WriteLine("No update have been made.");
+                return;
+            }
+            workingEmployee.FirstName = employee.FirstName;
+            workingEmployee.LastName = employee.LastName;
+            workingEmployee.EmployeeNumber = employee.EmployeeNumber;
+            workingEmployee.Email = employee.Email;
+            db.SubmitChanges();
+        }
+        private static void ReadEmployee(Employee employee)//tony
+        {
+            Employee testEmployee = null;
+            try
+            {
+                testEmployee = db.Employees.Where(c => c.EmployeeNumber == employee.EmployeeNumber).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("No employees have an id number that matches the employee requested.");
+                Console.WriteLine("No update have been made. Enter to continue.");
+                Console.ReadLine();
+                return;
+            }
+            Employee thisEmployee = db.Employees.Where(e => e.EmployeeNumber == employee.EmployeeNumber).Single();
+            Console.WriteLine(thisEmployee.EmployeeId);
+            Console.WriteLine(thisEmployee.EmployeeNumber);
+            Console.WriteLine(thisEmployee.FirstName);
+            Console.WriteLine(thisEmployee.LastName);
+            Console.WriteLine(thisEmployee.UserName);
+            Console.WriteLine(thisEmployee.Email);
+            if (thisEmployee.Animals!=null)
+            {
+                Console.WriteLine(thisEmployee.Animals);
+
+            }
+            Console.WriteLine("No update have been made. Press any key to continue.");
+            Console.ReadKey();
+        }
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
