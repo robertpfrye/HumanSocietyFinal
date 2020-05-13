@@ -251,7 +251,8 @@ namespace HumaneSociety
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
-            throw new NotImplementedException();
+            db.Animals.InsertOnSubmit(animal);
+            db.SubmitChanges();
         }
 
         internal static Animal GetAnimalByID(int id)//Rob
@@ -266,27 +267,26 @@ namespace HumaneSociety
                 Console.WriteLine("No animals have an id number that matches the animal requested.");
                 Console.WriteLine("No updates have been made. Enter to continue.");
                 Console.ReadLine();
-                return thisAnimal;
             }
 
-            Console.WriteLine(thisAnimal.AnimalId);
-            Console.WriteLine(thisAnimal.Name);
-            Console.WriteLine(thisAnimal.Weight);
-            Console.WriteLine(thisAnimal.Age);
-            Console.WriteLine(thisAnimal.Demeanor);
-            Console.WriteLine(thisAnimal.KidFriendly);
-            Console.WriteLine(thisAnimal.PetFriendly);
-            Console.WriteLine(thisAnimal.Gender);
-            Console.WriteLine(thisAnimal.AdoptionStatus);
-            Console.WriteLine(thisAnimal.CategoryId);
-            Console.WriteLine(thisAnimal.Category);
-            Console.WriteLine(thisAnimal.DietPlanId);
-            Console.WriteLine(thisAnimal.DietPlan);
-            Console.WriteLine(thisAnimal.EmployeeId);
-            Console.WriteLine(thisAnimal.Employee);
+            //Console.WriteLine(thisAnimal.AnimalId);
+            //Console.WriteLine(thisAnimal.Name);
+            //Console.WriteLine(thisAnimal.Weight);
+            //Console.WriteLine(thisAnimal.Age);
+            //Console.WriteLine(thisAnimal.Demeanor);
+            //Console.WriteLine(thisAnimal.KidFriendly);
+            //Console.WriteLine(thisAnimal.PetFriendly);
+            //Console.WriteLine(thisAnimal.Gender);
+            //Console.WriteLine(thisAnimal.AdoptionStatus);
+            //Console.WriteLine(thisAnimal.CategoryId);
+            //Console.WriteLine(thisAnimal.Category);
+            //Console.WriteLine(thisAnimal.DietPlanId);
+            //Console.WriteLine(thisAnimal.DietPlan);
+            //Console.WriteLine(thisAnimal.EmployeeId);
+            //Console.WriteLine(thisAnimal.Employee);
 
-            Console.WriteLine("No updates have been made. Press any key to continue.");
-            Console.ReadKey();
+            //Console.WriteLine("No updates have been made. Press any key to continue.");
+            //Console.ReadKey();
 
             return thisAnimal;
             //throw new NotImplementedException();
@@ -295,8 +295,8 @@ namespace HumaneSociety
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)//Rob
         {
             Animal currentAnimal = null;
-            //"Select Update:", "1. Category", "2. Name", "3. Age", "4. Demeanor", 
-            //"5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Finished"
+            Category categoryfromdb = null;
+            bool doOperation = false;          
             try
             {
                 currentAnimal = db.Animals.Where(a => a.AnimalId == animalId).Single();
@@ -307,21 +307,50 @@ namespace HumaneSociety
                 Console.WriteLine("No updates have been made.");
                 return;
             }
-            /*currentAnimal.Name = animal.Name;
-            currentAnimal.Weight = animal.Weight;
-            currentAnimal.Age = animal.Age;
-            currentAnimal.Demeanor = animal.Demeanor;
-            currentAnimal.KidFriendly = animal.KidFriendly;
-            currentAnimal.PetFriendly = animal.PetFriendly;
-            currentAnimal.Gender = animal.Gender;
-            currentAnimal.AdoptionStatus = animal.AdoptionStatus;
-            currentAnimal.CategoryId = animal.CategoryId;
-            currentAnimal.Category = animal.Category;
-            currentAnimal.DietPlanId = animal.DietPlanId;
-            currentAnimal.DietPlan = animal.DietPlan;
-            currentAnimal.EmployeeId = animal.EmployeeId;
-            currentAnimal.Employee = animal.Employee;
-            db.SubmitChanges();*/
+            string category;
+            doOperation= updates.TryGetValue(1, out category);
+            if(doOperation)
+            {
+                try
+                {
+                    categoryfromdb = db.Categories.Where(a => a.Name.Contains(category)).Single();
+                }
+                catch
+                {
+                    categoryfromdb = new Category();
+                    categoryfromdb.Name = category;
+                    db.Categories.InsertOnSubmit(categoryfromdb);
+                    db.SubmitChanges();
+                    categoryfromdb = db.Categories.Where(a => a.Name.Contains(category)).Single();
+                }
+            }
+            currentAnimal.CategoryId = categoryfromdb.CategoryId;
+            //dictionary key/value guide
+            //"Select Update:", "1. Category", "2. Name", "3. Age", "4. Demeanor", 
+            //"5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Finished"
+            string name;
+            if (updates.TryGetValue(2, out name))
+            {
+                currentAnimal.Name = name;
+            }
+            //rob, make this one below like the one above^
+            string weight;
+            updates.TryGetValue(7, out weight);
+            currentAnimal.Weight = int.Parse(weight);
+            //then do the same for the rest of the dictionary values above.
+
+            
+            //currentAnimal.Age = animal.Age;
+            //currentAnimal.Demeanor = animal.Demeanor;
+            //currentAnimal.KidFriendly = animal.KidFriendly;
+            //currentAnimal.PetFriendly = animal.PetFriendly;
+            //currentAnimal.Gender = animal.Gender;
+            //currentAnimal.AdoptionStatus = animal.AdoptionStatus;
+            //currentAnimal.DietPlanId = animal.DietPlanId;
+            //currentAnimal.DietPlan = animal.DietPlan;
+            //currentAnimal.EmployeeId = animal.EmployeeId;
+            //currentAnimal.Employee = animal.Employee;
+            db.SubmitChanges();
 
             //throw new NotImplementedException();
         }
@@ -340,21 +369,32 @@ namespace HumaneSociety
         // TODO: Misc Animal Things
         internal static int GetCategoryId(string categoryName)
         {
-            throw new NotImplementedException();
+            var category= db.Categories.Where(c => c.Name == categoryName).Single();
+            return category.CategoryId;
         }
         
-        internal static Room GetRoom(Animal animalId)//Check if animal null
+        internal static Room GetRoom(int animalId)//Check if animal null
         {
-            throw new NotImplementedException();
+            try
+            {
+                return db.Rooms.Where(r => r.AnimalId == animalId).Single();
+            }
+            catch
+            {
+                Console.WriteLine("that animal is not is the building. any key to go back");
+                Console.ReadKey();
+                return null; 
+            }
         }
         
         internal static int GetDietPlanId(string dietPlanName)
         {
-            throw new NotImplementedException();
+            var diet = db.DietPlans.Where(d => d.Name.Contains(dietPlanName)).Single();
+            return diet.DietPlanId;
         }
 
         // TODO: Adoption CRUD Operations
-        internal static void Adopt(Animal animal, Client client)//Check if animal null
+        internal static void Adopt(Animal animal, Client client)
         {
             throw new NotImplementedException();
         }
@@ -377,12 +417,29 @@ namespace HumaneSociety
         // TODO: Shots Stuff
         internal static IQueryable<AnimalShot> GetShots(Animal animal)
         {
-            throw new NotImplementedException();
+            return db.AnimalShots.Where(a => a.AnimalId == animal.AnimalId);
         }
 
         internal static void UpdateShot(string shotName, Animal animal)
         {
-            throw new NotImplementedException();
+            Shot shot = null;
+            try
+            {
+                shot = db.Shots.Where(s => s.Name == shotName).Single();
+            }
+            catch (InvalidOperationException e)
+            {
+                Shot newshot = new Shot();
+                newshot.Name = shotName;
+                db.Shots.InsertOnSubmit(newshot);
+                db.SubmitChanges();
+                shot = db.Shots.Where(s => s.Name == shotName).Single();
+            }
+
+            animal.AnimalShots = shot.AnimalShots;
+            
+            db.SubmitChanges();
+
         }
     }
 }
