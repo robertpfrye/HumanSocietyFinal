@@ -388,7 +388,9 @@ namespace HumaneSociety
         }
         
         // TODO: Animal Multi-Trait Search
-        internal static List<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates) // parameter(s)?
+
+        internal static List<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates)
+
         {
             List<string> command = new List<string>() { "Category", "Name", "Age", "Demeanor", "KidFriendly", "PetFriendly", "Weight", "ID" };
             List<Animal> animal = new List<Animal>();
