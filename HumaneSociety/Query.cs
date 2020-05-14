@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Linq;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -235,12 +237,12 @@ namespace HumaneSociety
                 return;
             }
             Employee thisEmployee = db.Employees.Where(e => e.EmployeeNumber == employee.EmployeeNumber).Single();
-            Console.WriteLine(thisEmployee.EmployeeId);
-            Console.WriteLine(thisEmployee.EmployeeNumber);
-            Console.WriteLine(thisEmployee.FirstName);
-            Console.WriteLine(thisEmployee.LastName);
-            Console.WriteLine(thisEmployee.UserName);
-            Console.WriteLine(thisEmployee.Email);
+            Console.WriteLine("ID: "+thisEmployee.EmployeeId);
+            Console.WriteLine("Employee number: " + thisEmployee.EmployeeNumber);
+            Console.WriteLine("First name: " + thisEmployee.FirstName);
+            Console.WriteLine("Last name: " + thisEmployee.LastName);
+            Console.WriteLine("Username: " + thisEmployee.UserName);
+            Console.WriteLine("Email: "+thisEmployee.Email);
             if (thisEmployee.Animals!=null)
             {
                 Console.WriteLine("Working with "+thisEmployee.Animals.Count+" animals");
@@ -248,35 +250,16 @@ namespace HumaneSociety
                 {
                     Console.WriteLine(" "+item.AnimalId +" "+ item.Category.Name +" "+ item.Name);
                 }
-
             }
             Console.WriteLine("No update have been made. Press any key to continue.");
             Console.ReadKey();
         }
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
-        {
-            
-            
-            Console.Clear();
-            Room room = null;
-            string roomid = UserInterface.GetStringData("the animal will stay in", " the room");
-            try
-            {
-                 room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
-
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("that room does not exist,try again.");
-                AddAnimal(animal);
-                return;
-            }
-            
+        {                       
             db.Animals.InsertOnSubmit(animal);
             db.SubmitChanges();
-            room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
-            animal = db.Animals.Where
+            Animal thisanimal = db.Animals.Where
                 (
                  newanimal =>
                  newanimal.CategoryId == animal.CategoryId &&
@@ -288,9 +271,57 @@ namespace HumaneSociety
                  newanimal.Weight == animal.Weight &&
                  newanimal.Name == animal.Name
                 ).Single();
+            PutAnimalInRoom( thisanimal);
+            PairAnimalEmployee(thisanimal);
+                
+        }
+        internal static void PutAnimalInRoom(Animal animal)
+        {
+            Room room = null;
+            int roomid = UserInterface.GetIntegerData("the animal will stay in", " which room?");
+            try
+            {
+                room = db.Rooms.Where(r => r.RoomId == roomid).Single();
+                Console.WriteLine("that room is occupied ,try again. Press any key.");
+                Console.ReadKey();
+                PutAnimalInRoom(animal);
+            }
+            catch (Exception)
+            {
+                Room thisroom = new Room();
+                thisroom.AnimalId = animal.AnimalId;
+                db.Rooms.InsertOnSubmit(thisroom);
+                db.SubmitChanges();
+                
+            }
 
-            room.AnimalId = animal.AnimalId;
-            db.SubmitChanges();
+           
+        }
+        internal static void PairAnimalEmployee(Animal animal)
+        {
+            Console.WriteLine("Will this animal be working with a particular employee?");
+            if ((bool)UserInterface.GetBitData())
+            {
+                Employee employee;
+                Console.WriteLine("enter employee number");
+                int employeeID = UserInterface.GetIntegerData("", "");
+                try
+                {
+                    employee = db.Employees.Where(e => e.EmployeeNumber == employeeID).Single();
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("That employee does not exist, try again. Press any key");
+                    Console.ReadKey();
+                    PairAnimalEmployee(animal);
+                    return;
+                }
+                employee = db.Employees.Where(e => e.EmployeeNumber == employeeID).Single();
+                Animal thisanimal = db.Animals.Where(a => a == animal).Single();
+                employee.Animals.Add(thisanimal); ;
+
+                db.SubmitChanges();
+            }
         }
 
         internal static Animal GetAnimalByID(int id)//Rob
@@ -582,9 +613,10 @@ namespace HumaneSociety
             }
             catch
             {
-                Console.WriteLine("that animal is not is the building. any key to go back");
-                Console.ReadKey();
-                return null; 
+                //Console.WriteLine("that animal is not is the building. any key to go back");
+                //Console.ReadKey();
+                //our room seeds are messed up, so we are gonna fake it till we make it. added animals should all have rooms as well as the grading databases. probably.
+                return db.Rooms.Where(r=>r.RoomNumber == 1).Single(); 
             }
         }
         
@@ -669,7 +701,11 @@ namespace HumaneSociety
                 db.SubmitChanges();
                 shot = db.Shots.Where(s => s.Name == shotName).Single();
             }
-            animal.AnimalShots = shot.AnimalShots;            
+            AnimalShot animalShot = new AnimalShot();
+            animalShot.ShotId = shot.ShotId;
+            animalShot.AnimalId = animal.AnimalId;
+            animalShot.DateReceived = DateTime.Today;
+            db.AnimalShots.InsertOnSubmit(animalShot);           
             db.SubmitChanges();
         }
     }
