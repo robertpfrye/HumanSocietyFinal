@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -242,7 +243,11 @@ namespace HumaneSociety
             Console.WriteLine(thisEmployee.Email);
             if (thisEmployee.Animals!=null)
             {
-                Console.WriteLine(thisEmployee.Animals);
+                Console.WriteLine("Working with "+thisEmployee.Animals.Count+" animals");
+                foreach (var item in thisEmployee.Animals)
+                {
+                    Console.WriteLine(" "+item.AnimalId +" "+ item.Category.Name +" "+ item.Name);
+                }
 
             }
             Console.WriteLine("No update have been made. Press any key to continue.");
@@ -251,6 +256,22 @@ namespace HumaneSociety
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
+            Console.Clear();
+            Room room = null;
+            string roomid = UserInterface.GetStringData("the room", " this animal will stay in");
+            try
+            {
+                 room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("that room does not exist,try again.");
+                AddAnimal(animal);
+                return;
+            }
+            room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
+            room.AnimalId = animal.AnimalId;
             db.Animals.InsertOnSubmit(animal);
             db.SubmitChanges();
         }
@@ -365,20 +386,174 @@ namespace HumaneSociety
         internal static List<Animal> SearchForAnimalsByMultipleTraits(Dictionary<int, string> updates)
 
         {
-            List<string> command = new List<string>() { "Category", "Name", "Age", "Demeanor", "KidFriendly", "PetFriendly", "Weight", "ID" };
-            List<Animal> animal = new List<Animal>();
+            int categoryid=0;
+            string thiscategory;
             List<Animal> output = new List<Animal>();
+            if (updates.TryGetValue(1, out thiscategory))
+            {
+                categoryid = GetCategoryId(thiscategory);
+            }
+            IQueryable<Animal> dbOut1 = null;
+            IQueryable<Animal> dbOut2 = null;
+            IQueryable<Animal> dbOut3 = null;
+            IQueryable<Animal> dbOut4 = null;
+            IQueryable<Animal> dbOut5 = null;
+            IQueryable<Animal> dbOut6 = null;
+            IQueryable<Animal> dbOut7 = null;
+            IQueryable<Animal> dbOut8 = null;
 
+            foreach (KeyValuePair<int, string> items in updates)
+            {
+                switch (items.Key)
+                {
+                    case 1:
+                        dbOut1 = db.Animals.Where(a => a.CategoryId == categoryid);
+                        break;
+                    case 2:
+                        dbOut2 = db.Animals.Where(a => a.Name == items.Value);
+                        break;
+                    case 3:
+                        dbOut3 = db.Animals.Where(a => a.Age.ToString() == items.Value);
+                        break;
+                    case 4:
+                        dbOut4 = db.Animals.Where(a => a.Demeanor == items.Value);
+                        break;
+                    case 5:
+                        dbOut5 = db.Animals.Where(a => a.KidFriendly.ToString() == items.Value);
+                        break;
+                    case 6:
+                        dbOut6 = db.Animals.Where(a => a.PetFriendly.ToString() == items.Value);
+                        break;
+                    case 7:
+                        dbOut7 = db.Animals.Where(a => a.Weight.ToString() == items.Value);
+                        break;
+                    case 8:
+                        dbOut8 = db.Animals.Where(a => a.AnimalId.ToString() == items.Value);
+                        break;                   
+                }
+                List<List<Animal>> listofAnimals = new List<List<Animal>>();
+                if (dbOut1!=null)
+                {
+                    listofAnimals.Add(dbOut1.ToList());
+                }
+                if (dbOut2 != null)
+                {
+                    listofAnimals.Add(dbOut2.ToList());
+                }
+                if (dbOut3 != null)
+                {
+                    listofAnimals.Add(dbOut3.ToList());
+                }
+                if (dbOut4 != null)
+                {
+                    listofAnimals.Add(dbOut4.ToList());
+                }
+                 if (dbOut5!=null)
+                {
+                    listofAnimals.Add(dbOut5.ToList());
+                }
+                if (dbOut6 != null)
+                {
+                    listofAnimals.Add(dbOut6.ToList());
+                }
+                if (dbOut7 != null)
+                {
+                    listofAnimals.Add(dbOut7.ToList());
+                }
+                if (dbOut8 != null)
+                {
+                    listofAnimals.Add(dbOut8.ToList());
+                }
+                foreach (List<Animal> animalList in listofAnimals)
+                {
+                    foreach (Animal animal in animalList)
+                    {
+                        if (dbOut1 != null)
+                        {
+                            if (!dbOut1.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut2 != null)
+                        {
+                            if (!dbOut2.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut3 != null)
+                        {
+                            if (!dbOut3.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut4 != null)
+                        {
+                            if (!dbOut4.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut5 != null)
+                        {
+                            if (!dbOut5.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut6 != null)
+                        {
+                            if (!dbOut6.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut7 != null)
+                        {
+                            if (!dbOut7.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        if (dbOut8 != null)
+                        {
+                            if (!dbOut8.Contains(animal))
+                            {
+                                break;
+                            }
+                        }
+                        output.Add(animal);
+                    }
+                }
 
-            //foreach (KeyValuePair<int,string> update in updates)
-            //{
-            //  animal=( db.Animals.Where(a => a[command[update.Key]].ToString() == update.Value.ToString())).ToList();
-            //    foreach (Animal item in animal)
-            //    {
-            //        output.Add(item);
-            //    }
-            //}
+            }
             return output.Distinct().ToList();
+            /*
+            List<string> command = new List<string>() { "Category", "Name", "Age", "Demeanor", "KidFriendly", "PetFriendly", "Weight", "ID" };
+            List<Animal> output = new List<Animal>();
+            int categoryid=0;
+            string thiscategory;
+            if (updates.TryGetValue(1,out thiscategory))
+            {
+                categoryid = GetCategoryId(thiscategory);
+            }
+            foreach (KeyValuePair<int, string> update in updates)
+            {
+                if (update.Key==1)
+                {
+                   IQueryable<Animal> animalfromID = db.Animals.Where(a => a.AnimalId == categoryid);
+                }
+                IQueryable<Animal> animal = (db.Animals.Where(a => a[command[update.Key]].ToString() == update.Value.ToString()));
+                List<Animal> queried = animal.ToList();
+                foreach (Animal item in queried)
+                {
+                    output.Add(item);
+                }
+            }
+            */
+
         }
 
         // TODO: Misc Animal Things
