@@ -256,9 +256,11 @@ namespace HumaneSociety
         // TODO: Animal CRUD Operations
         internal static void AddAnimal(Animal animal)
         {
+            
+            
             Console.Clear();
             Room room = null;
-            string roomid = UserInterface.GetStringData("the room", " this animal will stay in");
+            string roomid = UserInterface.GetStringData("the animal will stay in", " the room");
             try
             {
                  room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
@@ -270,9 +272,24 @@ namespace HumaneSociety
                 AddAnimal(animal);
                 return;
             }
-            room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
-            room.AnimalId = animal.AnimalId;
+            
             db.Animals.InsertOnSubmit(animal);
+            db.SubmitChanges();
+            room = db.Rooms.Where(r => r.RoomId.ToString() == roomid).Single();
+            animal = db.Animals.Where
+                (
+                 newanimal =>
+                 newanimal.CategoryId == animal.CategoryId &&
+                 newanimal.Demeanor == animal.Demeanor &&
+                 newanimal.DietPlanId == animal.DietPlanId &&
+                 newanimal.Age == animal.Age &&
+                 newanimal.KidFriendly == animal.KidFriendly &&
+                 newanimal.PetFriendly == animal.PetFriendly &&
+                 newanimal.Weight == animal.Weight &&
+                 newanimal.Name == animal.Name
+                ).Single();
+
+            room.AnimalId = animal.AnimalId;
             db.SubmitChanges();
         }
 
@@ -289,11 +306,7 @@ namespace HumaneSociety
                 Console.WriteLine("No updates have been made. Enter to continue.");
                 Console.ReadLine();
             }
-
-
-
             return thisAnimal;
-
         }
 
         internal static void UpdateAnimal(int animalId, Dictionary<int, string> updates)//Rob
@@ -325,10 +338,11 @@ namespace HumaneSociety
                     categoryfromdb.Name = category;
                     db.Categories.InsertOnSubmit(categoryfromdb);
                     db.SubmitChanges();
-                    categoryfromdb = db.Categories.Where(a => a.Name.Contains(category)).Single();
+
                 }
+                categoryfromdb = db.Categories.Where(a => a.Name.Contains(category)).Single();                db.SubmitChanges();
+                currentAnimal.CategoryId = categoryfromdb.CategoryId;                
             }
-            currentAnimal.CategoryId = categoryfromdb.CategoryId;
             //dictionary key/value guide
             //"Select Update:", "1. Category", "2. Name", "3. Age", "4. Demeanor", 
             //"5. Kid friendly", "6. Pet friendly", "7. Weight", "8. Finished"
@@ -366,10 +380,7 @@ namespace HumaneSociety
             if ( updates.TryGetValue(7, out weight))
             {
                 currentAnimal.Weight = int.Parse(weight);
-            }
-
-
- 
+            } 
             db.SubmitChanges();
 
 
